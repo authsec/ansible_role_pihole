@@ -16,7 +16,7 @@
 - name: Install python docker support
   pip:
     name: docker
-    state: latest
+    state: present
 - name: Ensure docker is up
   systemd:
       name: docker
