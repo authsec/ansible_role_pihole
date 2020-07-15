@@ -85,7 +85,7 @@ photon,example.net,192.168.128.19,,00:0c:29:51:80:1f,"vm-dns","VM using VM based
 
 ## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The role uses the following variables:
 
 | Variable                                  | Default                                                                                        | Description                                                                                                                                                                                                                          |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -131,45 +131,104 @@ A description of the settable variables for this role should go here, including 
 
 ## Example Playbook
 
-The example below shows a playbook you can use to configure a physical
-raspberry pi. On top of that the playbook also copies a SSH public key to the
-raspberry, updates the OS and sets the hostname from the inventory file.
+The example below shows a playbook you can use to configure pi-hole on a Photon
+OS based virtual machine which is reflected in the inventory file. 
 
-**rpi-dns.yml:**
+### Folder structure
 
-    ---
-    # Configure a physical raspberry pi to run Pi-hole as a bootstrap environment
-    - hosts: dns
-      gather_facts: yes
-      become: yes
-      tasks: 
-        - name: Set authorized key taken from file
-          authorized_key:
-            user: pi
-            state: present
-            key: "{{ lookup('file', 'ssh/id_rsa.pub') }}"
-        - name: Update cache if last update more then 1h ago.
-          apt:
-            update_cache: yes
-            cache_valid_time: 3600
-        - name: Upgrade all packages to the latest version
-          apt:
-            name: "*"
-            state: latest
-        - name: Setting hostname
-          hostname: 
-            name: "{{ inventory_hostname_short }}"
-        - include_role: 
-            name: authsec.pihole
-          vars:
-            riv_pihole_admin_password: "{{ vault_pihole_admin_password }}"
-            riv_pihole_dhcp_active: "true"
-            riv_pihole_dhcp_start: "192.168.128.8"
-            riv_pihole_dhcp_end: "192.168.128.252"
-            riv_pihole_dhcp_router: "192.168.128.1"
-            riv_pihole_domain: "example.com"
-            riv_pihole_show_summary: true
-            riv_pihole_dns_db_configuration_file: "{{ inventory_dir }}/pihole-dns-database.csv"
+The folder structure is as follows (the roles folder will be created automatically later):
+
+```
+|-- dns-db.csv
+|-- inventory
+|-- pihole-vm.yml
+`-- roles
+    `-- authsec.pihole
+        |-- defaults
+        |   `-- main.yml
+        |-- files
+        |   `-- mappings.csv
+        |-- LICENSE
+        |-- meta
+        |   `-- main.yml
+        |-- README.md
+        |-- tasks
+        |   |-- checkssh-photonos.yml
+        |   |-- checkssh.yml
+        |   |-- firewall-iptables.yml
+        |   |-- install-apt.yml
+        |   |-- install-photonos.yml
+        |   `-- main.yml
+        `-- templates
+            |-- 02-pihole-dhcp.conf.j2
+            |-- 10-pihole-custom-static.conf.j2
+            `-- setupVars.conf.j2
+```
+
+### Import Role
+
+You can import the role into your project using:
+
+``` bash
+#> ansible-galaxy install -p roles authsec.pihole
+```
+
+### Create database 
+
+This is a copy of the example database in `roles/authsec.pihole/files`.
+
+**dns-db.csv:**
+
+``` csv
+hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
+,,,,,"tag:vm-dns,option:dns-server,192.168.128.253","Sets value of dhcp-option configuration option"
+,,,,,"tag:pi-dns,option:dns-server,192.168.128.254","Sets value of dhcp-option configuration option"
+slash,example.net,192.168.128.2,,,,"ESXi Host"
+mohh,example.net,192.168.128.5,,,,"The Brain (vCenter Server)"
+blib,example.net,192.168.128.18,,00:0c:29:43:37:dc,"pi-dns","VM using Raspberry Pi based DNS (and DHCP) server"
+photon,example.net,192.168.128.19,,00:0c:29:51:80:1f,"vm-dns","VM using VM based DNS server"
+vmhole,example.net,192.168.128.253,true,,,"Pi-hole Virtual machine DNS server"
+pihole,example.net,192.168.128.254,,,,"Raspberry Pi backed Pi-Hole DNS and DHCP server for this network, docker based and ansible managed"
+```
+
+**inventory:**
+
+```
+[dns_vms]
+vmhole.example.net ansible_host=192.168.128.253 ansible_user=pihole ansible_become_method='su' ansible_become_password='kevin.is.dead' ansible_python_interpreter=/usr/bin/python3
+```
+
+**pihole-vm.yml:**
+
+``` yaml
+---
+# Configure a machine to run pi-hole inside a docker container
+- hosts: dns_vms
+  gather_facts: yes
+  become: yes
+  tasks: 
+    - include_role: 
+        name: authsec.pihole
+      vars:
+        # true|false
+        riv_pihole_admin_password: "secure.me"
+        riv_pihole_dhcp_active: "false"
+        riv_pihole_dhcp_start: "192.168.128.8"
+        riv_pihole_dhcp_end: "192.168.128.252"
+        riv_pihole_dhcp_router: "192.168.128.1"
+        riv_pihole_domain: "example.net"
+        riv_pihole_show_summary: true
+        riv_pihole_dns_db_configuration_file: "dns-db.csv"
+```
+
+### Run ansible
+
+Once everything is configured, you can run `ansible` to setup pi-hole on the
+system configured in the `inventory`.
+
+``` bash
+#> ansible-playbook -i inventory pihole-vm.yml
+```
 
 License
 -------
