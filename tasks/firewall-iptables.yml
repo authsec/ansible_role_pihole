@@ -1,4 +1,4 @@
-- name: Allow ping 
+- name: Allow ping
   iptables:
     chain: INPUT
     jump: ACCEPT
@@ -12,7 +12,7 @@
     jump: ACCEPT
   when: riv_pihole_dhcp_active|bool
 
-- name: Allow HTTP 
+- name: Allow HTTP
   iptables:
     chain: INPUT
     protocol: tcp

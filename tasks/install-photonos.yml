@@ -1,5 +1,5 @@
 - name: Install docker and pip3
   command: tdnf -y install docker python3-pip
   register: result
-  changed_when: 
+  changed_when:
     - '"Complete!" in result.stdout'

@@ -5,12 +5,12 @@
 - name: Running apt install environment
   include_tasks:
     file: install-apt.yml
-  when: 
+  when:
     - (ansible_facts['distribution'] == 'Debian') or (ansible_facts['distribution'] == 'Ubuntu')
 - name: Running photon os install environment
   include_tasks:
     file: install-photonos.yml
-  when: 
+  when:
     - ansible_facts['distribution'] == 'VMware Photon OS'
 - name: Install python docker support
   pip:
@@ -19,7 +19,7 @@
 - name: Ensure docker is up
   systemd:
       name: docker
-      enabled: true 
+      enabled: true
       state: started
 - name: Pull Pi-hole image before resolved is shut down
   docker_image:
@@ -28,17 +28,17 @@
 - name: Running general SSH check
   include_tasks:
     file: checkssh.yml
-  when: 
+  when:
     - ansible_facts['distribution'] != 'VMware Photon OS'
 - name: Running Photon OS SSH check
   include_tasks:
     file: checkssh-photonos.yml
-  when: 
+  when:
     - ansible_facts['distribution'] == 'VMware Photon OS'
 - name: Make sure default resolved service is stopped
   systemd:
       name: systemd-resolved.service
-      enabled: false 
+      enabled: false
       state: stopped
 - name: Read configuration data
   read_csv:
@@ -48,12 +48,12 @@
   delegate_to: localhost
   become: no
 - name: Ensure pihole folder is present
-  file: 
+  file:
     path: "{{ riv_pihole_etc_pihole_folder }}"
     state: directory
     mode: '0775'
 - name: Ensure dnsmasq.d folder is present
-  file: 
+  file:
     path: "{{ riv_pihole_etc_dnsmasq_folder }}"
     state: directory
     mode: '0755'
@@ -115,7 +115,7 @@
       WEBPASSWORD: "{{ riv_pihole_admin_password }}"
       ServerIP: "{{ riv_pihole_serverip }}"
 - name: DNS/DHCP server summary
-  pause: 
+  pause:
     seconds: 1
     prompt: |
       Pi-Hole web PASSWORD:        "{{ riv_pihole_admin_password }}"
@@ -125,4 +125,3 @@
   changed_when: false
   when: riv_pihole_show_summary
   delegate_to: localhost
-
