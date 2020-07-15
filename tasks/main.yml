@@ -1,5 +1,6 @@
 ---
-- set_fact:
+- name: Setting or generating password for web interface
+  set_fact:
     riv_pihole_admin_password: "{{ riv_pihole_admin_password_generated }}"
     when: riv_pihole_admin_password is undefined
 - name: Running apt install environment
