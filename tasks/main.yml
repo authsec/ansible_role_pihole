@@ -59,7 +59,7 @@
     state: directory
     mode: '0755'
 - name: Generate encoded Pi-hole WEBPASSWORD
-  shell: echo -n $(echo -n "{{ riv_pihole_admin_password }}" | sha256sum | sed 's/\s.*$//') | sha256sum | sed 's/\s.*$//'
+  shell: set -o pipefail && echo -n $(echo -n "{{ riv_pihole_admin_password }}" | sha256sum | sed 's/\s.*$//') | sha256sum | sed 's/\s.*$//'
   register: riv_pihole_admin_password_encoded
   changed_when: false
 - name: Provision Pihole config
