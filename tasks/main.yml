@@ -1,0 +1,123 @@
+---
+- set_fact:
+    riv_pihole_admin_password: "{{ riv_pihole_admin_password_generated }}"
+    when: riv_pihole_admin_password is undefined
+- include_tasks:
+    file: install-apt.yml
+  when: 
+    - (ansible_facts['distribution'] == 'Debian') or (ansible_facts['distribution'] == 'Ubuntu')
+- include_tasks:
+    file: install-photonos.yml
+  when: 
+    - ansible_facts['distribution'] == 'VMware Photon OS'
+- name: Install python docker support
+  pip:
+    name: docker
+    state: latest
+- name: Ensure docker is up
+  systemd:
+      name: docker
+      enabled: true 
+      state: started
+- name: Pull Pi-hole image before resolved is shut down
+  docker_image:
+    name: "{{ riv_pihole_docker_image }}"
+    source: pull
+- include_tasks:
+    file: checkssh.yml
+  when: 
+    - ansible_facts['distribution'] != 'VMware Photon OS'
+- include_tasks:
+    file: checkssh-photonos.yml
+  when: 
+    - ansible_facts['distribution'] == 'VMware Photon OS'
+- name: Make sure default resolved service is stopped
+  systemd:
+      name: systemd-resolved.service
+      enabled: false 
+      state: stopped
+- name: Read configuration data
+  read_csv:
+    path: "{{ riv_pihole_dns_db_configuration_file }}"
+    delimiter: ','
+  register: mappings
+  delegate_to: localhost
+  become: no
+- name: Ensure pihole folder is present
+  file: 
+    path: "{{ riv_pihole_etc_pihole_folder }}"
+    state: directory
+    mode: '0775'
+- name: Ensure dnsmasq.d folder is present
+  file: 
+    path: "{{ riv_pihole_etc_dnsmasq_folder }}"
+    state: directory
+    mode: '0755'
+- name: Generate encoded Pi-hole WEBPASSWORD
+  shell: echo -n $(echo -n "{{ riv_pihole_admin_password }}" | sha256sum | sed 's/\s.*$//') | sha256sum | sed 's/\s.*$//'
+  register: riv_pihole_admin_password_encoded
+  changed_when: false
+- name: Provision Pihole config
+  template:
+     src: setupVars.conf.j2
+     dest: "{{ riv_pihole_etc_pihole_folder }}/setupVars.conf"
+     mode: '0644'
+  register: riv_pihole_config
+- name: Provision DNS configuration
+  template:
+    src: 10-pihole-custom-static.conf.j2
+    dest: "{{ riv_pihole_etc_dnsmasq_folder }}/10-pihole-custom-static.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  register: riv_pihole_dns_config
+  vars:
+    mappings: mappings
+- name: Provision DHCP configuration
+  template:
+    src: 02-pihole-dhcp.conf.j2
+    dest: "{{ riv_pihole_etc_dnsmasq_folder }}/02-pihole-dhcp.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  register: riv_pihole_dhcp_config
+- include_tasks:
+    file: firewall-iptables.yml
+  when: riv_pihole_open_firewall_ports
+- name: Ensure pihole docker container is running
+  docker_container:
+    name: pihole
+    image: "{{ riv_pihole_docker_image }}"
+    state: started
+    restart: "{{ riv_pihole_config.changed or riv_pihole_dns_config.changed or riv_pihole_dhcp_config.changed }}"
+    restart_policy: unless-stopped
+    networks_cli_compatible: yes
+    network_mode: host
+    networks:
+      - name: "{{ riv_pihole_docker_network }}"
+    capabilities:
+      - NET_ADMIN
+    dns_servers:
+      - "{{ riv_pihole_sys_dns_server1 }}"
+      - "{{ riv_pihole_sys_dns_server2 }}"
+    volumes:
+    - "{{ riv_pihole_etc_pihole_folder }}:/etc/pihole/"
+    - "{{ riv_pihole_etc_dnsmasq_folder }}:/etc/dnsmasq.d/"
+    env:
+      TZ: '{{ riv_pihole_timezone }}'
+      DNS1: '{{ riv_pihole_dns_server1 }}'
+      DNS2: '{{ riv_pihole_dns_server2 }}'
+      WEBPASSWORD: "{{ riv_pihole_admin_password }}"
+      ServerIP: "{{ riv_pihole_serverip }}"
+- name: DNS/DHCP server summary
+  pause: 
+    seconds: 1
+    prompt: |
+      Pi-Hole web PASSWORD:        "{{ riv_pihole_admin_password }}"
+      Pi-Hole Server IP:           "{{ riv_pihole_serverip }}"
+      Pi-Hole Server Name:         "{{ inventory_hostname }}"
+      Pi-Hole DHCP server active:  "{{ riv_pihole_dhcp_active }}"
+  changed_when: false
+  when: riv_pihole_show_summary
+  delegate_to: localhost
+

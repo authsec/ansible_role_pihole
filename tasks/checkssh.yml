@@ -1,0 +1,5 @@
+- name: Make sure ssh is enabled, not just started
+  systemd:
+      name: ssh.service
+      enabled: true 
+      state: started

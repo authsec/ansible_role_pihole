@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+# Change dhcp-option to dhcp-option-force if you need PXELinux support
+{% for item in mappings.list %}
+{% if item.dhcp_option|length>0 and item.mac_address|length==0 and item.ip_address|length==0 and item.hostname|length==0%}
+dhcp-option={{ item.dhcp_option }}
+{% else %}
+
+# {{ item.comment }}
+address=/{{ item.hostname }}.{{ item.domainname }}/{{ item.ip_address }}
+ptr-record={{ (item.ip_address.split('.'))[::-1]|join('.') }}.in-addr.arpa,{{ item.hostname }}.{{ item.domainname }}
+dhcp-host={% if item.mac_address is defined and item.mac_address|length %}{{ item.mac_address }},{% endif %}{% if item.dhcp_option is defined and item.dhcp_option|length >0%}set:{{ item.dhcp_option }},{% endif %}{{ item.ip_address }},{{ item.hostname }}{% if item.static is defined and item.static|length%},ignore{% endif %}
+
+{% endif %}
+{% endfor %}

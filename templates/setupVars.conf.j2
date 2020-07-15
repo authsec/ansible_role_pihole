@@ -1,0 +1,29 @@
+# {{ ansible_managed }}
+
+BLOCKING_ENABLED=true
+DHCP_ACTIVE={{ riv_pihole_dhcp_active }}
+DHCP_START={{ riv_pihole_dhcp_start }}
+DHCP_END={{ riv_pihole_dhcp_end }}
+DHCP_ROUTER={{ riv_pihole_dhcp_router }}
+DHCP_LEASETIME={{ riv_pihole_dhcp_leasetime }}
+PIHOLE_DOMAIN={{ riv_pihole_domain }}
+DHCP_IPv6={{ riv_pihole_dhcp_ipv6 }}
+DHCP_rapid_commit={{ riv_pihole_dhcp_rapid_commit }}
+DNSMASQ_LISTENING={{ riv_pihole_dnsmasq_listening }}
+PIHOLE_DNS_1={{ riv_pihole_dns_server1 }}
+PIHOLE_DNS_2={{ riv_pihole_dns_server2 }}
+WEBPASSWORD={{ riv_pihole_admin_password_encoded.stdout }}
+QUERY_LOGGING={{ riv_pihole_query_logging }}
+INSTALL_WEB_SERVER={{ riv_pihole_install_web_server }}
+INSTALL_WEB_INTERFACE={{ riv_pihole_install_web_interface }}
+LIGHTTPD_ENABLED={{ riv_pihole_lighttpd_enabled }}
+IPV4_ADDRESS={{ riv_pihole_ipv4_address }}
+IPV6_ADDRESS={{ riv_pihole_ipv6_address }}
+DNS_BOGUS_PRIV={{ riv_pihole_dns_bogus_priv }}
+DNS_FQDN_REQUIRED={{ riv_pihole_dns_fqdn_required }}
+DNSSEC={{ riv_pihole_dnssec }}
+CONDITIONAL_FORWARDING={{ riv_pihole_conditional_forwarding }}
+CONDITIONAL_FORWARDING_IP={{ riv_pihole_conditional_forwarding_ip }}
+CONDITIONAL_FORWARDING_DOMAIN={{ riv_pihole_conditional_forwarding_domain }}
+CONDITIONAL_FORWARDING_REVERSE={{ riv_pihole_conditional_forwarding_reverse }}
+PIHOLE_INTERFACE={{ riv_pihole_interface }}

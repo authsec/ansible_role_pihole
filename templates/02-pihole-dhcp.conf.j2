@@ -1,0 +1,11 @@
+###############################################################################
+#  DHCP SERVER CONFIG FILE AUTOMATICALLY POPULATED BY PI-HOLE WEB INTERFACE.  #
+#            ANY CHANGES MADE TO THIS FILE WILL BE LOST ON CHANGE             #
+###############################################################################
+dhcp-authoritative
+dhcp-range={{ riv_pihole_dhcp_start }},{{ riv_pihole_dhcp_end }},{{ riv_pihole_dhcp_leasetime }}
+dhcp-option=option:router,{{ riv_pihole_dhcp_router }}
+dhcp-leasefile=/etc/pihole/dhcp.leases
+#quiet-dhcp
+
+domain={{ riv_pihole_domain }}

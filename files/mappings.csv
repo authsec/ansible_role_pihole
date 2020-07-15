@@ -1,0 +1,9 @@
+hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
+,,,,,"tag:vm-dns,option:dns-server,192.168.128.253","Sets value of dhcp-option configuration option"
+,,,,,"tag:pi-dns,option:dns-server,192.168.128.254","Sets value of dhcp-option configuration option"
+slash,example.net,192.168.128.2,,,,"ESXi Host"
+mohh,example.net,192.168.128.5,,,,"The Brain (vCenter Server)"
+blib,example.net,192.168.128.18,,00:0c:29:43:37:dc,"pi-dns","VM using Raspberry Pi based DNS (and DHCP) server"
+photon,example.net,192.168.128.19,,00:0c:29:51:80:1f,"vm-dns","VM using VM based DNS server"
+vmhole,example.net,192.168.128.253,true,,,"Pi-hole Virtual machine DNS server"
+pihole,example.net,192.168.128.254,,,,"Raspberry Pi backed Pi-Hole DNS and DHCP server for this network, docker based and ansible managed"
