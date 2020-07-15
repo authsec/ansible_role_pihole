@@ -2,11 +2,13 @@
 - set_fact:
     riv_pihole_admin_password: "{{ riv_pihole_admin_password_generated }}"
     when: riv_pihole_admin_password is undefined
-- include_tasks:
+- name: Running apt install environment
+  include_tasks:
     file: install-apt.yml
   when: 
     - (ansible_facts['distribution'] == 'Debian') or (ansible_facts['distribution'] == 'Ubuntu')
-- include_tasks:
+- name: Running photon os install environment
+  include_tasks:
     file: install-photonos.yml
   when: 
     - ansible_facts['distribution'] == 'VMware Photon OS'
@@ -23,11 +25,13 @@
   docker_image:
     name: "{{ riv_pihole_docker_image }}"
     source: pull
-- include_tasks:
+- name: Running general SSH check
+  include_tasks:
     file: checkssh.yml
   when: 
     - ansible_facts['distribution'] != 'VMware Photon OS'
-- include_tasks:
+- name: Running Photon OS SSH check
+  include_tasks:
     file: checkssh-photonos.yml
   when: 
     - ansible_facts['distribution'] == 'VMware Photon OS'
@@ -81,7 +85,8 @@
     group: root
     mode: '0644'
   register: riv_pihole_dhcp_config
-- include_tasks:
+- name: Setting up firewall
+  include_tasks:
     file: firewall-iptables.yml
   when: riv_pihole_open_firewall_ports
 - name: Ensure pihole docker container is running
