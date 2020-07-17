@@ -60,6 +60,8 @@
     mode: '0755'
 - name: Generate encoded Pi-hole WEBPASSWORD
   shell: set -o pipefail && echo -n $(echo -n "{{ riv_pihole_admin_password }}" | sha256sum | sed 's/\s.*$//') | sha256sum | sed 's/\s.*$//'
+  args:
+    executable: /bin/bash
   register: riv_pihole_admin_password_encoded
   changed_when: false
 - name: Provision Pihole config
