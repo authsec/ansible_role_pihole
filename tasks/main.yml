@@ -3,6 +3,14 @@
   set_fact:
     riv_pihole_admin_password: "{{ riv_pihole_admin_password_generated }}"
     when: riv_pihole_admin_password is undefined
+- name: Ensure we do have DNS available for the installation.
+  lineinfile:
+    path: /etc/resolv.conf
+    insertbefore: '^{{ item.property | regex_escape() }} '
+    line: '{{ item.property }} {{ item.value }}'
+  with_items:
+    - { property: 'nameserver', value: '127.0.0.1'}
+    - { property: 'nameserver', value: '9.9.9.9'}
 - name: Running apt install environment
   include_tasks:
     file: install-apt.yml
@@ -25,6 +33,7 @@
 - name: Pull Pi-hole image before resolved is shut down
   docker_image:
     name: "{{ riv_pihole_docker_image }}"
+    force_source: yes
     source: pull
 - name: Running general SSH check
   include_tasks:
