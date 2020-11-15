@@ -37,6 +37,10 @@ hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
 ,,,,,"tag:pi-dns,option:dns-server,192.168.128.254","Sets value of dhcp-option configuration option"
 ```
 
+**Note:** If you are setting up multiple DNS servers here, you probably do want
+to set the `riv_pihole_dns_default_tag` option when configuring your setup to set a default DNS server
+for clients without a specific configuration.
+
 #### Setup IP/Host mapping
 
 The configuration below configures the host with the name `slash` to receive an
@@ -90,6 +94,7 @@ The role uses the following variables:
 | Variable                                  | Default                                                                                        | Description                                                                                                                                                                                                                          |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | riv_pihole_admin_password_generated       | {{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}                            | This variable sets the password for the web user interface. If no password is set, it will be auto-generated. The password value is shown in plain text in the last step if the variable `riv_pihole_show_summary` is set to `true`. |
+| riv_pihole_dns_default_tag                |                                                                                                | This variable sets a DHCP tag that lets you specify a default DNS server for hosts not listed in the configuration csv file.                                                                                                         |
 | riv_pihole_show_summary                   | false                                                                                          | If set `true` the last step will show the (generated) password in plain text along with some useful information like the IP address and name of the host pihole was installed on.                                                    |
 | riv_pihole_docker_network                 | host                                                                                           | The network to which docker connects. If you want to use DHCP, you need to connect to the host network.                                                                                                                              |
 | riv_pihole_docker_purge_networks          | yes                                                                                            | Remove the created network when the docker container is shut down.                                                                                                                                                                   |

@@ -3,7 +3,7 @@
 #            ANY CHANGES MADE TO THIS FILE WILL BE LOST ON CHANGE             #
 ###############################################################################
 dhcp-authoritative
-dhcp-range={{ riv_pihole_dhcp_start }},{{ riv_pihole_dhcp_end }},{{ riv_pihole_dhcp_leasetime }}
+dhcp-range={% if riv_pihole_dns_default_tag is defined and riv_pihole_dns_default_tag|length >0%}set:{{ riv_pihole_dns_default_tag }},{% endif %}{{ riv_pihole_dhcp_start }},{{ riv_pihole_dhcp_end }},{{ riv_pihole_dhcp_leasetime }}
 dhcp-option=option:router,{{ riv_pihole_dhcp_router }}
 dhcp-leasefile=/etc/pihole/dhcp.leases
 #quiet-dhcp

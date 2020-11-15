@@ -6,6 +6,11 @@ riv_pihole_admin_password_generated: "{{ lookup('password', '/dev/null length=15
 riv_pihole_docker_network: "host"
 riv_pihole_docker_purge_networks: "yes"
 
+# If you are using tags to assign multiple DNS servers to an IP address, 
+# you can use this option to set a default, where you do not want to define 
+# a specific IP address to name mapping.
+riv_pihole_dns_default_tag: ""
+
 riv_pihole_show_summary: false
 
 riv_pihole_dhcp_active: "false"
