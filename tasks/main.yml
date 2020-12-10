@@ -126,6 +126,10 @@
       DNS2: '{{ riv_pihole_dns_server2 }}'
       WEBPASSWORD: "{{ riv_pihole_admin_password }}"
       ServerIP: "{{ riv_pihole_serverip }}"
+      REV_SERVER: "{{ riv_pihole_rev_server_enabled }}"
+      REV_SERVER_CIDR: "{{ riv_pihole_rev_server_cidr }}"
+      REV_SERVER_DOMAIN: "{{ riv_pihole_rev_server_domain }}"
+      REV_SERVER_TARGET: "{{ riv_pihole_rev_server_target }}"
 - name: DNS/DHCP server summary
   pause:
     seconds: 1

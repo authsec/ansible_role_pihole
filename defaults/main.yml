@@ -31,13 +31,13 @@ riv_pihole_install_web_interface: "true"
 riv_pihole_lighttpd_enabled: ""
 riv_pihole_ipv4_address: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] | default(ansible_host) }}"
 riv_pihole_ipv6_address: ""
-riv_pihole_dns_bogus_priv: ""
-riv_pihole_dns_fqdn_required: ""
-riv_pihole_dnssec: ""
-riv_pihole_conditional_forwarding: ""
-riv_pihole_conditional_forwarding_ip: ""
-riv_pihole_conditional_forwarding_domain: ""
-riv_pihole_conditional_forwarding_reverse: ""
+riv_pihole_dns_bogus_priv: "false"
+riv_pihole_dns_fqdn_required: "false"
+riv_pihole_dnssec: "false"
+riv_pihole_rev_server_enabled: "false" # previously conditional forwarding (riv_pihole_conditional_forwarding)
+riv_pihole_rev_server_cidr: "" # previously conditional forwarding IP (riv_pihole_conditional_forwarding_ip)
+riv_pihole_rev_server_domain: "" # previously conditional forwarding domain (riv_pihole_conditional_forwarding_domain)
+riv_pihole_rev_server_target: "" # previously conditional forwarding host (riv_pihole_conditional_forwarding_reverse)
 
 riv_pihole_docker_image: "pihole/pihole:latest"
 
