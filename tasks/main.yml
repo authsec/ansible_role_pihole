@@ -97,6 +97,16 @@
     group: root
     mode: '0644'
   register: riv_pihole_dhcp_config
+- name: Provisioning host aliases
+  template:
+    src: ansible-managed.hosts.j2
+    dest: "{{ riv_pihole_etc_pihole_folder }}/ansible-managed.hosts"
+    owner: root
+    group: root
+    mode: '0644'
+  register: riv_pihole_dns_alias_config
+  vars:
+    mappings: mappings
 - name: Setting up firewall
   include_tasks:
     file: firewall-iptables.yml

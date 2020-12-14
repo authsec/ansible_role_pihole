@@ -32,9 +32,9 @@ pi.
 #### Set DHCP Options
 
 ``` csv
-hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
-,,,,,"tag:vm-dns,option:dns-server,192.168.128.253","Sets value of dhcp-option configuration option"
-,,,,,"tag:pi-dns,option:dns-server,192.168.128.254","Sets value of dhcp-option configuration option"
+hostname,domainname,ip_address,static,mac_address,dhcp_option,type,comment
+,,,,,"tag:vm-dns,option:dns-server,192.168.30.253","<<tag>>","Sets value of dhcp-option configuration option, here which DNS server to use"
+,,,,,"tag:pi-dns,option:dns-server,192.168.30.254","<<tag>>","Sets value of dhcp-option configuration option, here which DNS server to use"
 ```
 
 **Note:** If you are setting up multiple DNS servers here, you probably do want
@@ -46,11 +46,11 @@ for clients without a specific configuration.
 The configuration below configures the host with the name `slash` to receive an
 IP address of `192.168.128.2` if that address is still available. If a DHCP
 lease was already handed out to another machine, a new IP address will be
-assigned.
+assigned. It also identifies the machine as a physical host.
 
 ``` csv
-hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
-slash,example.net,192.168.128.2,,,,"ESXi Host"
+hostname,domainname,ip_address,static,mac_address,dhcp_option,type,comment
+slash,example.net,192.168.128.2,true,,,"<<physical>>","ESXi Host""
 ```
 
 #### Setup static IP address
@@ -58,11 +58,11 @@ slash,example.net,192.168.128.2,,,,"ESXi Host"
 If you want to make sure that the IP address is assigned to a specific hostname
 only, you can set the `static` field to `true` to achieve that. Setting this
 option will instruct dnsmasq to ignore DHCP requests from any host named
-`vmhole` as shown in the example below.
+`vmhole` as shown in the example below. The type is also identified as a virtual machine.
 
 ``` csv
-hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
-vmhole,example.net,192.168.128.253,true,,,"Pi-hole Virtual machine DNS server"
+hostname,domainname,ip_address,static,mac_address,dhcp_option,type,comment
+vmhole,example.net,192.168.128.253,true,,,"<<virtual>>","Pi-hole Virtual machine DNS server"
 ```
  
 #### Setup Mac address/IP address mapping
@@ -72,8 +72,8 @@ address of the device, use the following entry in the csv configuration
 database.
 
 ``` csv
-hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
-blib,example.net,192.168.128.18,,00:0c:29:43:37:dc,,"VM mapped on mac address"
+hostname,domainname,ip_address,static,mac_address,dhcp_option,type,comment
+blib,example.net,192.168.128.18,,00:0c:29:43:37:dc,,"<<virtual>>","Pi-hole Virtual machine DNS server"
 ```
 
 #### Set different DNS server
@@ -83,8 +83,8 @@ the appropriate DHCP option when defining the mapping. The below example shows
 how to set the `vm-dns` DNS server for the photon host.
 
 ``` csv
-hostname,domainname,ip_address,static,mac_address,dhcp_option,comment
-photon,example.net,192.168.128.19,,00:0c:29:51:80:1f,"vm-dns","VM using VM based DNS server"
+hostname,domainname,ip_address,static,mac_address,dhcp_option,type,comment
+photon,example.net,192.168.128.19,,00:0c:29:51:80:1f,"vm-dns","<<virtual>>","Proxy server VM based on a docker image, using vm-dns server"
 ```
 
 ## Role Variables

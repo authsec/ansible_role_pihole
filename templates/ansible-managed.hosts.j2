@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{% for item in mappings.list %}
+{% if item.type=="<<alias>>" %}
+# {{ item.comment }}
+{{ item.ip_address }} {{ item.hostname }} {{ item.hostname }}.{{ item.domainname }}
+
+{% endif %}
+{% endfor %}

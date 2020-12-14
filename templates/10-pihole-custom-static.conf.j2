@@ -2,9 +2,9 @@
 
 # Change dhcp-option to dhcp-option-force if you need PXELinux support
 {% for item in mappings.list %}
-{% if item.dhcp_option|length>0 and item.mac_address|length==0 and item.ip_address|length==0 and item.hostname|length==0%}
+{% if item.type=="<<tag>>" %}
 dhcp-option={{ item.dhcp_option }}
-{% else %}
+{% elif item.type=="<<physical>>" or item.type=="<<virtual>>" %}
 
 # {{ item.comment }}
 address=/{{ item.hostname }}.{{ item.domainname }}/{{ item.ip_address }}
@@ -13,3 +13,6 @@ dhcp-host={% if item.mac_address is defined and item.mac_address|length %}{{ ite
 
 {% endif %}
 {% endfor %}
+
+# Include ansible managed static hosts
+addn-hosts=/etc/pihole/ansible-managed.hosts
